@@ -90,6 +90,36 @@ class User {
         return null;
     }
 
+    static public function loadUserByEmail(PDO $conn, $email) {
+        $stmt = $conn->prepare('SELECT * FROM Users WHERE email=:email');
+        $result = $stmt->execute(['email' => $email]);
+        if ($result === true && $stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $loadedUser = new User();
+            $loadedUser->id = $row['id'];
+            $loadedUser->username = $row['username'];
+            $loadedUser->hashPass = $row['hash_pass'];
+            $loadedUser->email = $row['email'];
+            return $loadedUser;
+        }
+        return null;
+    }
+
+    static public function loadUserByUsername(PDO $conn, $username) {
+        $stmt = $conn->prepare('SELECT * FROM Users WHERE username=:username');
+        $result = $stmt->execute(['username' => $username]);
+        if ($result === true && $stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $loadedUser = new User();
+            $loadedUser->id = $row['id'];
+            $loadedUser->username = $row['username'];
+            $loadedUser->hashPass = $row['hash_pass'];
+            $loadedUser->email = $row['email'];
+            return $loadedUser;
+        }
+        return null;
+    }
+
     static public function loadAllUsers(PDO $conn) {
         $ret = [];
         $sql = "SELECT * FROM Users";
@@ -122,7 +152,17 @@ class User {
 }
 
 include '../config.php';
-$result = User::loadUserById($conn, 2);
+$user1 = new User();
+$user1->setEmail('kuba@kuba.pl');
+$user1->setUsername('kuba');
+$user1->setPassword('kuba');
+$user1->saveToDB($conn);
+$user2 = new User();
+$user2->setEmail('donka@donka.pl');
+$user2->setUsername('donka');
+$user2->setPassword('donka');
+$user2->saveToDB($conn);
+$result = User::loadUserByEmail($conn, 'kuba@kuba.pl');
 var_dump($result);
-$result->delete($conn);
-var_dump($result);
+$result2 = User::loadUserByUsername($conn, 'donka');
+var_dump($result2);
