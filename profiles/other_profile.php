@@ -2,6 +2,7 @@
 include '../config.php';
 include '../src/User.php';
 include '../src/Tweet.php';
+include '../src/Comment.php';
 if (!isset($_SESSION['id'])) {
     header("Location: ../login.php");
     echo 'Musisz być zalogowany żeby oglądać profile.';
@@ -9,6 +10,9 @@ if (!isset($_SESSION['id'])) {
 $otherUserId = $_GET['id'];
 $otherUser = User::loadUserById($conn, $otherUserId);
 $otherUserTweets = Tweet::loadTweetsByUserId($conn, $otherUserId);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    include '../search_form_service.php';
+}
 ?>
 
 <!doctype html>
@@ -39,7 +43,11 @@ $otherUserTweets = Tweet::loadTweetsByUserId($conn, $otherUserId);
                 </div>
             </div>
         </div>
-
+        <div class="container">
+            <div class="btn-group" role="group">
+                <p><?php include '../search_form.php'; ?></p>
+            </div>
+        </div>
         <h3>
             Wpisy użytkownika: <?php echo $otherUser->getUsername(); ?>
         </h3>
@@ -49,7 +57,7 @@ $otherUserTweets = Tweet::loadTweetsByUserId($conn, $otherUserId);
                 if (count($otherUserTweets) > 0) {
                     echo '<tr><th>Treść wpisu</th><th>data</th><th>Komentarze</th></tr>';
                     foreach ($otherUserTweets as $row) {
-                        echo '<tr><td><a href="../tweet.php?tweetId=' . $row->getId() . '">' . $row->getText() . "</a></td><td>" . $row->getCreationTime() . "</td></tr>";
+                        echo '<tr><td><a href="../tweet.php?tweetId=' . $row->getId() . '">' . $row->getText() . "</a></td><td>" . $row->getCreationTime() . "</td><td>" . count(Comment::loadCommentsByTweetId($conn, $row->getId())) . "</td></tr>";
                     }
                 } else {
                     echo "Brak wpisów<br>";

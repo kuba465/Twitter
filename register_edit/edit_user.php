@@ -47,9 +47,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit'])) {
 
         <div class="float-left">
             <div class="container">
-                <div class="btn-group" role="group" aria-label="...">
+                <div class="btn-group btn-group-justified" role="group" aria-label="...">
                     <div class="btn-group" role="group">
                         <a href="../profiles/user_profile.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-circle-arrow-left"></div> Powrót do strony głównej</button></a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a href="../messages/messages.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-inbox"></div> Wiadomości</button></a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a href="../login.php?logout"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-off"></div> Wyloguj się</button></a>
                     </div>
                     <div class="btn-group" role="group">
                         <p>Jesteś zalogowany jako: <?php echo $_SESSION['username']; ?></p>

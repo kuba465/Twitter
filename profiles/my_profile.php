@@ -2,12 +2,15 @@
 include '../config.php';
 include '../src/User.php';
 include '../src/Tweet.php';
+include '../src/Comment.php';
 if (!isset($_SESSION['id'])) {
     header("Location: ../login.php");
     echo 'Musisz być zalogowany żeby oglądać profile.';
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    include '../search_form_service.php';
     if (isset($_POST['newTweet'])) {
         if (!isset($_POST['userTweet']) || is_null($_POST['userTweet']) || strlen($_POST['userTweet']) <= 0) {
             echo "Zła treść tweeta.";
@@ -50,6 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
         <div class="container">
+            <div class="btn-group" role="group">
+                <p><?php include '../search_form.php'; ?></p>
+            </div>
+        </div>
+        <div class="container">
             <div class="row">
                 <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
                 </div>
@@ -73,20 +81,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Twoje wpisy:
             </h3>
         </div>
-        <div class="panel panel-default">
-            <table class = "table">
-                <?php
-                $result = Tweet::loadTweetsByUserId($conn, $_SESSION['id']);
-                if (count($result) > 0) {
-                    echo '<tr><th>Treść wpisu</th><th>data</th><th>Komentarze</th></tr>';
-                    foreach ($result as $row) {
-                        echo '<tr><td><a href="../tweet.php?tweetId=' . $row->getId() . '">' . $row->getText() . "</a></td><td>" . $row->getCreationTime() . "</td></tr>";
+        <div class="container">
+            <div class="panel panel-default">
+                <table class = "table">
+                    <?php
+                    $result = Tweet::loadTweetsByUserId($conn, $_SESSION['id']);
+                    if (count($result) > 0) {
+                        echo '<tr><th>Treść wpisu</th><th>Data opublikowania</th><th>Komentarze</th></tr>';
+                        foreach ($result as $row) {
+                            echo '<tr><td><a href="../tweet.php?tweetId=' . $row->getId() . '">' . $row->getText() . "</a></td><td>" . $row->getCreationTime() . "</td><td>" . count(Comment::loadCommentsByTweetId($conn, $row->getId())) . "</td></tr>";
+                        }
+                    } else {
+                        echo "Brak wpisów<br>";
                     }
-                } else {
-                    echo "Brak wpisów<br>";
-                }
-                ?>
-            </table>
+                    ?>
+                </table>
+            </div>
         </div>
     </body>
 </html>
