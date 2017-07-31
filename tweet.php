@@ -1,14 +1,33 @@
 <?php
 session_start();
+if (!isset($_SESSION['id'])) {
+    header("Location: ../login.php");
+}
 include 'config.php';
 include 'src/Tweet.php';
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    if (isset($_GET['tweetId'])) {
-        var_dump($_GET['tweetId']);
-        $tweet = Tweet::loadTweetById($conn, $_GET['tweetId']);
-        var_dump($tweet);
+include 'src/Comment.php';
+
+$tweetId = $_GET['tweetId'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    include 'search_form_service.php';
+    if (isset($_POST['newComment'])) {
+        if (!isset($_POST['userComment']) || is_null($_POST['userComment']) || strlen($_POST['userComment']) <= 0) {
+            echo "Zła treść komentarza.";
+        } else {
+            $comment = new Comment();
+            $comment->setTweetId($tweetId);
+            $comment->setUserId($_SESSION['id']);
+            $comment->setText($_POST['userComment']);
+            $comment->setUsername($_SESSION['username']);
+
+            $comment->saveToDB($conn);
+        }
     }
 }
+
+$tweet = Tweet::loadTweetById($conn, $tweetId);
+$comments = Comment::loadCommentsByTweetId($conn, $tweetId);
 ?>
 
 <!doctype html>
@@ -40,12 +59,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 </div>
             </div>
         </div>
-        <br>
+        <div class="container">
+            <div class="btn-group" role="group">
+                <p><?php include 'search_form.php'; ?></p>
+            </div>
+        </div>
         <div class="float-left">
             <div class="container">
                 <div class="panel panel-default">
                     <table class="table">
-                        <tr><th>Autor</th><th>Treść</th><th>Data</th></tr>
+                        <tr><th>Autor</th><th>Treść wpisu</th><th>Data opublikowania</th></tr>
                         <?php
                         echo '<tr><td><a href="profiles/user_profile.php?id="' . $tweet->getUserId() . '">' . $tweet->getUsername() . "</a></td><td>" . $tweet->getText() . "</td><td>" . $tweet->getCreationTime() . "</td></tr>";
                         ?>
@@ -64,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                                 <input type="text" class="form-control" name="userComment" id="userComment" maxlength="60" placeholder="Treść komentarza"
                                        value="">
                             </div>
-                            <button type="submit" class="btn btn-primary">Skomentuj</button>
+                            <button type="submit" name="newComment" class="btn btn-primary">Skomentuj</button>
                         </form>
                     </div>
                     <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
@@ -76,7 +99,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     Komentarze: 
                 </h3>
             </div>
-            <!--tabelę można wziąć od prowadzącego-->
-            <!--w tabeli każdy wpis to link i przekazujesz jego id getem do tweet.php-->
+            <div class="container">
+                <div class="panel panel-default">
+                    <table class = "table">
+                        <?php
+                        if (count($comments) > 0) {
+                            echo '<tr><th>Autor</th><th>Treść komentarza</th><th>Data dodania</th></tr>';
+                            foreach ($comments as $row) {
+                                echo '<tr><td><a href="profiles/user_profile.php?id=' . $row->getUserId() . '">' . $row->getUsername() . "</a></td><td>" . $row->getText() . "</td><td>" . $row->getCreationTime() . "</td></tr>";
+                            }
+                        } else {
+                            echo "Brak wpisów<br>";
+                        }
+                        ?>
+                    </table>
+                </div>
+            </div>
     </body>
 </html>
