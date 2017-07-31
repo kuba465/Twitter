@@ -71,8 +71,8 @@ class User {
             if ($result === true) {
                 return true;
             }
-            return false;
         }
+        return false;
     }
 
     static public function loadUserById(PDO $conn, $id) {
@@ -149,20 +149,38 @@ class User {
         return true;
     }
 
-}
+    static public function login(PDO $conn, $email, $passFromUser) {
+        $user = User::loadUserByEmail($conn, $email);
 
-include '../config.php';
-$user1 = new User();
-$user1->setEmail('kuba@kuba.pl');
-$user1->setUsername('kuba');
-$user1->setPassword('kuba');
-$user1->saveToDB($conn);
-$user2 = new User();
-$user2->setEmail('donka@donka.pl');
-$user2->setUsername('donka');
-$user2->setPassword('donka');
-$user2->saveToDB($conn);
-$result = User::loadUserByEmail($conn, 'kuba@kuba.pl');
-var_dump($result);
-$result2 = User::loadUserByUsername($conn, 'donka');
-var_dump($result2);
+        if ($user !== null && password_verify($passFromUser, $user->getPassword()) == $passFromUser) {
+            return $user;
+        } else {
+            return false;
+        }
+    }
+
+    static public function verifyEmailFromUser($email) {
+        if (!isset($email) || is_null($email) || !is_string($email) || is_numeric($email) || strlen($email) <= 0 || filter_var($email, FILTER_VALIDATE_EMAIL) == false) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    static public function verifyPasswordFromUser($pass) {
+        if (!isset($pass) || is_null($pass) || strlen($pass) <= 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    static public function verifyUsernameFromUser($username) {
+        if (!isset($username) || is_null($username) || strlen($username) <= 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+}    

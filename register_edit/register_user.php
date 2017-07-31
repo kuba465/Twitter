@@ -1,3 +1,41 @@
+<?php
+session_start();
+
+if (isset($_SESSION['id'])) {
+    header("Location: profiles/user_profile.php");
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
+    include '../src/User.php';
+    if (User::verifyEmailFromUser($_POST['userEmail']) === false) {
+        echo "Podałeś złego e-maila.";
+    } elseif (User::verifyUsernameFromUser($_POST['userName']) === false) {
+        echo "Podałeś złą nazwę użytkownika.";
+    } elseif (User::verifyPasswordFromUser($_POST['userPassword']) === false) {
+        echo "Podałeś złe hasło.";
+    } else {
+        include '../config.php';
+
+        $user = new User();
+        $user->setEmail($_POST['userEmail']);
+        $user->setUsername($_POST['userName']);
+        $user->setPassword($_POST['userPassword']);
+
+        if ($user->saveToDB($conn) === true) {
+            $_SESSION['id'] = $user->getId();
+            $_SESSION['email'] = $user->getEmail();
+            $_SESSION['username'] = $user->getUsername();
+
+//            header("Location: ../profiles/user_profile.php");
+            header("refresh:5;url=../profiles/user_profile.php");
+            echo "Zarejestrowałeś konto ".$_SESSION['username']. ". Zostaniesz zalogowany za 5 sekund.";
+        } else {
+            echo "Podałeś złe dane logowania";
+        }
+    }
+}
+?>
+
 <!doctype html>
 <html lang="en">
     <head>
@@ -41,7 +79,7 @@
                             <input type="password" class="form-control" name="userPassword" id="userPassword"
                                    placeholder="Hasło użytkownika">
                         </div>
-                        <button type="submit" class="btn btn-primary">Stwórz</button>
+                        <button type="submit" name="register" class="btn btn-primary">Stwórz</button>
                     </form>
                 </div>
                 <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
