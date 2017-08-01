@@ -50,7 +50,7 @@ class Comment {
         $this->username = $newUsername;
     }
 
-    //settera do daty utworzenia nie ma, bo posty mają być dodawane tylko w obecnej dacie.
+    //settera do daty utworzenia nie ma, bo komentarze mają być dodawane tylko w obecnej dacie.
 
     public function getId() {
         return $this->id;
