@@ -1,3 +1,17 @@
+<?php
+session_start();
+include '../config.php';
+include '../src/User.php';
+include '../src/Message.php';
+if (!isset($_SESSION['id'])) {
+    header("Location: ../login.php");
+    echo 'Musisz być zalogowany żeby oglądać profile.';
+}
+$messages = Message::loadMessagesBySenderId($conn, $_SESSION['id']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    include '../search_form_service_other_pages.php';
+}
+?>
 <!doctype html>
 <html lang="en">
     <head>
@@ -9,22 +23,56 @@
         <link rel="stylesheet" media="screen" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     </head>
     <body>
-        <div class="float-left">
-            <div class="container">
-                <div class="btn-group" role="group" aria-label="...">
-                    <div class="btn-group" role="group">
-                        <a href="messages.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-circle-arrow-left"></div> Powrót do wiadomości</button></a>
-                    </div>
+        <div class="container">
+            <div class="btn-group btn-group-justified" role="group" aria-label="...">
+                <div class="btn-group" role="group">
+                    <a href="messages.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-circle-arrow-left"></div> Powrót do wiadomości</button></a>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="../profiles/user_profile.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-circle-arrow-left"></div> Wróć do swojej strony głównej</button></a>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="../all_tweets.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-home"></div> Wszystkie tweety z bazy</button></a>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="send_message.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-envelope"></div> Wyślij wiadomość</button></a>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="../login.php?logout"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-off"></div> Wyloguj się</button></a>
+                </div>
+                <div class="btn-group" role="group">
+                    <p>Jesteś zalogowany jako: <?php echo $_SESSION['username']; ?></p>
                 </div>
             </div>
         </div>
-        <br>
-        <h3>
-            Wiadomości wysłane:
-        </h3>
-
-        <!--tabelę można wziąć od prowadzącego-->
-        <!--w tabeli każdy wpis to link i przekazujesz jego id getem do message.php-->
-
+        <div class="container">
+            <div class="btn-group" role="group">
+                <p><?php include '../search_form.php'; ?></p>
+            </div>
+        </div>
+        <div class="container">
+            <h3>
+                Wiadomości wysłane: 
+            </h3>
+        </div>
+        <div class="container">
+            <div class="panel panel-default">
+                <table class = "table">
+                    <?php
+                    if (count($messages) > 0) {
+                        echo '<tr><th>Odbiorca</th><th>Treść wiadomości</th><th>Data wysłania</th></tr>';
+                        foreach ($messages as $row) {
+                            $short = strlen($row->getText()) > 30 ? substr($row->getText(), 0, 30) . "..." : $row->getText();
+                            echo '<tr><td><a href="../profiles/user_profile.php?id=' . $row->getReceiverId() . '">' . $row->getReceiverUsername() . "</a></td>"
+                            . '<td><a href="message.php?id=' . $row->getId() . '">' . $short . "</a></td>"
+                            . "<td>" . $row->getCreationTime() . "</td></tr>";
+                        }
+                    } else {
+                        echo "Brak wiadomości<br>";
+                    }
+                    ?>
+                </table>
+            </div>
+        </div>
     </body>
 </html>
