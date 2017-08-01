@@ -10,7 +10,7 @@ include 'src/Comment.php';
 $tweetId = $_GET['tweetId'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    include 'search_form_service.php';
+    include 'search_form_service_other_pages.php';
     if (isset($_POST['newComment'])) {
         if (!isset($_POST['userComment']) || is_null($_POST['userComment']) || strlen($_POST['userComment']) <= 0) {
             echo "Zła treść komentarza.";
@@ -43,9 +43,12 @@ $comments = Comment::loadCommentsByTweetId($conn, $tweetId);
     <body>
         <div class="float-left">
             <div class="container">
-                <div class="btn-group" role="group" aria-label="...">
+                <div class="btn-group btn-group-justified" role="group" aria-label="...">
                     <div class="btn-group" role="group">
                         <a href="profiles/user_profile.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-circle-arrow-left"></div> Powrót do strony głównej</button></a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a href="all_tweets.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-home"></div> Wszystkie tweety z bazy</button></a>
                     </div>
                     <div class="btn-group" role="group">
                         <a href="messages/messages.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-inbox"></div> Wiadomości</button></a>

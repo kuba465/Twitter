@@ -115,7 +115,7 @@ class Tweet {
 
     static public function loadAllTweets(PDO $conn) {
         $ret = [];
-        $sql = "SELECT * FROM Tweets";
+        $sql = "SELECT * FROM Tweets ORDER BY `date` DESC";
         $result = $conn->query($sql);
         if ($result !== false && $result->rowCount() > 0) {
             foreach ($result as $row) {
