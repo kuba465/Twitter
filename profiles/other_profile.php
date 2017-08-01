@@ -33,7 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="user_profile.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-circle-arrow-left"></div> Wróć do swojej strony głównej</button></a>
                 </div>
                 <div class="btn-group" role="group">
-                    <a href="../messages/send_message.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-envelope"></div> Wyślij wiadomość do użytkownika: <?php echo $otherUser->getUsername(); ?></button></a>
+                    <a href="../all_tweets.php"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-home"></div> Wszystkie tweety z bazy</button></a>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="../messages/send_message.php?id=<?php echo $otherUserId; ?>"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-envelope"></div> Wyślij wiadomość do użytkownika: <?php echo $otherUser->getUsername(); ?></button></a>
                 </div>
                 <div class="btn-group" role="group">
                     <a href="../login.php?logout"><button type="button" class="btn btn-default"><div class="glyphicon glyphicon-off"></div> Wyloguj się</button></a>
@@ -48,22 +51,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p><?php include '../search_form.php'; ?></p>
             </div>
         </div>
-        <h3>
-            Wpisy użytkownika: <?php echo $otherUser->getUsername(); ?>
-        </h3>
-        <div class="panel panel-default">
-            <table class = "table">
-                <?php
-                if (count($otherUserTweets) > 0) {
-                    echo '<tr><th>Treść wpisu</th><th>data</th><th>Komentarze</th></tr>';
-                    foreach ($otherUserTweets as $row) {
-                        echo '<tr><td><a href="../tweet.php?tweetId=' . $row->getId() . '">' . $row->getText() . "</a></td><td>" . $row->getCreationTime() . "</td><td>" . count(Comment::loadCommentsByTweetId($conn, $row->getId())) . "</td></tr>";
+        <div class="container">
+            <h3>
+                Wpisy użytkownika: <?php echo $otherUser->getUsername(); ?>
+            </h3>
+        </div>
+        <div class="container">
+            <div class="panel panel-default">
+                <table class = "table">
+                    <?php
+                    if (count($otherUserTweets) > 0) {
+                        echo '<tr><th>Treść wpisu</th><th>data</th><th>Komentarze</th></tr>';
+                        foreach ($otherUserTweets as $row) {
+                            echo '<tr><td><a href="../tweet.php?tweetId=' . $row->getId() . '">' . $row->getText() . "</a></td><td>" . $row->getCreationTime() . "</td><td>" . count(Comment::loadCommentsByTweetId($conn, $row->getId())) . "</td></tr>";
+                        }
+                    } else {
+                        echo "Brak wpisów<br>";
                     }
-                } else {
-                    echo "Brak wpisów<br>";
-                }
-                ?>
-            </table>
+                    ?>
+                </table>
+            </div>
         </div>
     </body>
 </html>
