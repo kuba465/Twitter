@@ -1,6 +1,8 @@
 Twitter by Jakub Paluszkiewicz
 ============================
 
+## Project that I created during my course in CodersLab
+
 This is my first application which I wrote in PHP.
 There are some basics of PHP, database. I wrote this without any framework.
 
